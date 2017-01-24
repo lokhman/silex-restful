@@ -1,0 +1,17 @@
+{
+    "name": "lokhman/silex-restful",
+    "type": "library",
+    "description": "Silex 2.0+ service provider for RESTful middleware",
+    "keywords": ["silex", "tools", "restful"],
+    "license": "MIT",
+    "authors": [{
+        "name": "Alexander Lokhman",
+        "email": "alex.lokhman@gmail.com"
+    }],
+    "autoload": {
+        "psr-4": { "Lokhman\\Silex\\": "src/Silex" }
+    },
+    "require": {
+        "silex/silex": "~2.0"
+    }
+}
