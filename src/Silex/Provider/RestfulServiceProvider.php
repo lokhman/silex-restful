@@ -43,16 +43,16 @@ class RestfulServiceProvider implements ServiceProviderInterface {
      * {@inheritdoc}
      */
     public function register(Container $app) {
-        $app['restful.controller_collection_wrapper_class'] =
+        $app['restful.controller_collection_wrapper.class'] =
             'Lokhman\Silex\Provider\Restful\ControllerCollectionWrapper';
 
         $app['restful'] = function(Container $app) {
-            $wrapperClass = $app['restful.controller_collection_wrapper_class'];
+            $wrapperClass = $app['restful.controller_collection_wrapper.class'];
             return new $wrapperClass($app, $app['controllers']);
         };
 
         $app['restful.controllers_factory'] = $app->factory(function(Container $app) {
-            $wrapperClass = $app['restful.controller_collection_wrapper_class'];
+            $wrapperClass = $app['restful.controller_collection_wrapper.class'];
             return new $wrapperClass($app, $app['controllers_factory']);
         });
 
