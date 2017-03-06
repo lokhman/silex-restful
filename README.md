@@ -1,4 +1,7 @@
 # silex-restful
+
+[![StyleCI](https://styleci.io/repos/79907109/shield?branch=master)](https://styleci.io/repos/79907109)
+
 RESTful middleware service provider for [**Silex 2.0+**](http://silex.sensiolabs.org/) micro-framework.
 
 > This project is a part of [`silex-tools`](https://github.com/lokhman/silex-tools) library.
