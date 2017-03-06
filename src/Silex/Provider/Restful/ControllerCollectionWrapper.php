@@ -3,6 +3,7 @@
  * Tools for Silex 2+ framework.
  *
  * @author Alexander Lokhman <alex.lokhman@gmail.com>
+ *
  * @link https://github.com/lokhman/silex-tools
  *
  * Copyright (c) 2016 Alexander Lokhman <alex.lokhman@gmail.com>
@@ -37,25 +38,27 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  * Wrapper class for ControllerCollection.
  *
  * @author Alexander Lokhman <alex.lokhman@gmail.com>
+ *
  * @link https://github.com/lokhman/silex-tools
  */
-class ControllerCollectionWrapper {
-
+class ControllerCollectionWrapper
+{
     protected $controllerCollection;
     protected $controllers;
     protected $static;
 
-    public function __construct(Application $app, ControllerCollection $controllerCollection) {
+    public function __construct(Application $app, ControllerCollection $controllerCollection)
+    {
         $this->controllerCollection = $controllerCollection;
         $this->controllers = $app['restful.controllers'];
 
         // callback to generate new instance of current class
-        $this->static = function($controllerCollection) use ($app) {
+        $this->static = function ($controllerCollection) use ($app) {
             return new static($app, $controllerCollection);
         };
 
         // error handler must be executed here to match 405 Method Not Allowed
-        $app->error(function(\Exception $ex, Request $request, $code) use ($app) {
+        $app->error(function (\Exception $ex, Request $request, $code) use ($app) {
             foreach ($this->controllers as $controller) {
                 $route = $controller->getRoute()->getPath();
                 if ($route == $request->getPathInfo()) {
@@ -65,20 +68,21 @@ class ControllerCollectionWrapper {
         });
     }
 
-    public function __call($method, $arguments) {
+    public function __call($method, $arguments)
+    {
         $route = call_user_func_array([$this->controllerCollection, $method], $arguments);
         if (in_array($method, ['match', 'get', 'post', 'put', 'delete', 'options', 'patch'])) {
             $this->controllers[] = $route;
 
             // register early before middleware for route
-            $route->before(function(Request $request, Application $app) {
+            $route->before(function (Request $request, Application $app) {
                 if ($request->getContentType() == 'json') {
                     $data = json_decode($request->getContent(), true);
                     $request->request->replace(is_array($data) ? $data : []);
                 }
 
                 // transform every returned data
-                $app->view(function($data) use ($app, $request) {
+                $app->view(function ($data) use ($app, $request) {
                     $response = $app->json($data);
                     if ($request->query->has('callback')) {
                         try {
@@ -87,6 +91,7 @@ class ControllerCollectionWrapper {
                             throw new BadRequestHttpException($ex->getMessage(), $ex->getPrevious(), $ex->getCode());
                         }
                     }
+
                     return $response;
                 });
             }, Application::EARLY_EVENT);
@@ -103,8 +108,9 @@ class ControllerCollectionWrapper {
      *
      * @see ControllerCollection::mount()
      */
-    public function mount($prefix, callable $callback) {
-        $this->controllerCollection->mount($prefix, function($container) use ($callback) {
+    public function mount($prefix, callable $callback)
+    {
+        $this->controllerCollection->mount($prefix, function ($container) use ($callback) {
             $callback(call_user_func($this->static, $container));
         });
     }
@@ -114,8 +120,8 @@ class ControllerCollectionWrapper {
      *
      * @return ControllerCollection
      */
-    public function getControllerCollection() {
+    public function getControllerCollection()
+    {
         return $this->controllerCollection;
     }
-
 }

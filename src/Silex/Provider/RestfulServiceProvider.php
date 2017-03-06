@@ -3,6 +3,7 @@
  * Tools for Silex 2+ framework.
  *
  * @author Alexander Lokhman <alex.lokhman@gmail.com>
+ *
  * @link https://github.com/lokhman/silex-tools
  *
  * Copyright (c) 2016 Alexander Lokhman <alex.lokhman@gmail.com>
@@ -35,40 +36,43 @@ use Pimple\ServiceProviderInterface;
  * Silex service provider for RESTful middleware.
  *
  * @author Alexander Lokhman <alex.lokhman@gmail.com>
+ *
  * @link https://github.com/lokhman/silex-tools
  */
-class RestfulServiceProvider implements ServiceProviderInterface {
-
+class RestfulServiceProvider implements ServiceProviderInterface
+{
     /**
      * {@inheritdoc}
      */
-    public function register(Container $app) {
+    public function register(Container $app)
+    {
         $app['restful.controller_collection_wrapper.class'] =
             'Lokhman\Silex\Provider\Restful\ControllerCollectionWrapper';
 
-        $app['restful'] = function(Container $app) {
+        $app['restful'] = function (Container $app) {
             $wrapperClass = $app['restful.controller_collection_wrapper.class'];
+
             return new $wrapperClass($app, $app['controllers']);
         };
 
-        $app['restful.controllers_factory'] = $app->factory(function(Container $app) {
+        $app['restful.controllers_factory'] = $app->factory(function (Container $app) {
             $wrapperClass = $app['restful.controller_collection_wrapper.class'];
+
             return new $wrapperClass($app, $app['controllers_factory']);
         });
 
-        $app['restful.controllers'] = function() {
+        $app['restful.controllers'] = function () {
             return new \ArrayObject();
         };
 
         $app['restful.error_handler'] = $app->protect(
-            function(\Exception $ex, $code) use ($app) {
+            function (\Exception $ex, $code) use ($app) {
                 return $app->json([
-                    'status' => 'error',
+                    'status'      => 'error',
                     'status_code' => $code,
-                    'error' => $ex->getMessage(),
+                    'error'       => $ex->getMessage(),
                 ], $code);
             }
         );
     }
-
 }
