@@ -56,16 +56,6 @@ class ControllerCollectionWrapper
         $this->static = function ($controllerCollection) use ($app) {
             return new static($app, $controllerCollection);
         };
-
-        // error handler must be executed here to match 405 Method Not Allowed
-        $app->error(function (\Exception $ex, Request $request, $code) use ($app) {
-            foreach ($this->controllers as $controller) {
-                $route = $controller->getRoute()->getPath();
-                if ($route == $request->getPathInfo()) {
-                    return $app['restful.error_handler']($ex, $code);
-                }
-            }
-        });
     }
 
     public function __call($method, $arguments)
@@ -93,6 +83,11 @@ class ControllerCollectionWrapper
                     }
 
                     return $response;
+                });
+
+                // error handling (not for 404, 405, etc. - behind the firewall)
+                $app->error(function (\Exception $ex, Request $request, $code) use ($app) {
+                    return $app['restful.error_handler']($ex, $code);
                 });
             }, Application::EARLY_EVENT);
         }
